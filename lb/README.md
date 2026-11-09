@@ -5,15 +5,19 @@ network load balancer and a classic global HTTP load balancer.
 
 ## Settings
 
-`env.sh` reads `PROJECT_ID`, `ZONE` and `REGION`. The lab assigns them, so set
-them from the lab panel. If unset, `gcloud config` is used, and `REGION` is
-derived from `ZONE`.
+`env.sh` resolves `PROJECT_ID`, `ZONE` and `REGION` in this order: flag, env
+var, `gcloud config`, then the lab default (`us-east4-c`; `REGION` is derived
+from `ZONE`). `PROJECT_ID` has no default.
 
 ```bash
-export PROJECT_ID=<lab project>
-export ZONE=<lab zone>        # e.g. xx-yyyyN-a
-export REGION=<lab region>    # optional, derived from ZONE
+bash run-all.sh --project <lab project> --zone us-east4-c --region us-east4
+# or
+export PROJECT_ID=<lab project> ZONE=us-east4-c REGION=us-east4
+bash run-all.sh
 ```
+
+Every script accepts the same flags (`--zone=x` form too). A `--zone` without
+`--region` derives the region from the zone.
 
 Run from `lb/` (the scripts `cd` there themselves).
 
@@ -42,8 +46,9 @@ bash verify.sh       # curl VMs, network LB, HTTP LB
   differ, backends stay unhealthy.
 - Instance names `lb-backend-group-xxxx` come from `--base-instance-name`, as in
   the lab's expected page.
-- Startup script prints `Web Server: $HOSTNAME`, which equals the instance
-  name (web1, web2, web3), so it matches the lab's text.
+- `web1..3` get `scripts/startup-script.sh` with the literal name
+  (`Web Server: web1`). The MIG template uses `scripts/lb-backend-startup.sh`,
+  which prints `Page served from: <instance name>` as the lab expects.
 
 ## Known limits
 

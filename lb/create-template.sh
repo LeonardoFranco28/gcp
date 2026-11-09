@@ -11,4 +11,4 @@ gcloud compute instance-templates create lb-backend-template \
   --boot-disk-size=10GB \
   --boot-disk-type=pd-standard \
   --tags=allow-health-check \
-  --metadata-from-file=startup-script=scripts/startup-script.sh
+  --metadata-from-file=startup-script=scripts/lb-backend-startup.sh

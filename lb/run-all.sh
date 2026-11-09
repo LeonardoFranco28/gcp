@@ -1,7 +1,8 @@
 #!/bin/bash
 # Runs every task in dependency order. Stops at the first failure.
-set -e
 cd "$(dirname "$0")"
+source ./env.sh "$@" || exit 1   # parses flags, exports vars for the child scripts
+set -e
 
 bash create-firewall-rules.sh          # Tasks 1 + 3 firewalls
 bash create-multiinstances-nogroup.sh  # Task 1 web1..web3
