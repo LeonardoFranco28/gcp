@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "fdd1fd93-9716-4604-b1ec-07fd5a0b7d66",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "/home/leo/Escritorio/dev/gcp/.archify/architecture-lb-gcp-20261108-210105/candidate.json",
+  "output": "/home/leo/Escritorio/dev/gcp/.archify/architecture-lb-gcp-20261108-210105/lb-gcp.html",
+  "specification": {
+    "sha256": "afd069300aa748f40a8e2a8ed4caf4b062eaadbc272d5e8fb2df6faa08dba1f8",
+    "bytes": 4542
+  },
+  "artifact": {
+    "sha256": "38a19fa86df76bf32d130c1c5063650954327da01dbdd2a6529d24c9e2fe9361",
+    "bytes": 771282
+  }
+}

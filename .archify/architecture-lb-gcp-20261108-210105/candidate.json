@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "LB en GCP: estado actual de lb/",
+    "output": ".archify/architecture-lb-gcp-20261108-210105/lb-gcp.html",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    { "id": "users", "type": "external", "label": "Clientes", "sublabel": "Internet", "pos": [40, 320], "size": [120, 60] },
+
+    { "id": "ip", "type": "cloud", "label": "IP lb-ipv4-1", "sublabel": "global IPv4", "pos": [235, 100], "size": [120, 60] },
+    { "id": "fwd", "type": "cloud", "label": "Forwarding rule", "sublabel": "http-content-rule :80", "pos": [230, 240], "size": [130, 60] },
+    { "id": "proxy", "type": "cloud", "label": "Target HTTP proxy", "sublabel": "http-lb-proxy", "pos": [430, 240], "size": [130, 60] },
+    { "id": "urlmap", "type": "cloud", "label": "URL map", "sublabel": "web-map-http", "pos": [630, 240], "size": [120, 60] },
+    { "id": "backend", "type": "cloud", "label": "Backend service", "sublabel": "web-backend-service", "pos": [820, 240], "size": [130, 60], "tag": "port-name http" },
+    { "id": "hc", "type": "cloud", "label": "Health check", "sublabel": "http-basic-check :80", "pos": [820, 100], "size": [130, 60] },
+    { "id": "mig", "type": "backend", "label": "MIG lb-backend-group", "sublabel": "3 x lb-backend-group-xxxx", "pos": [1020, 240], "size": [150, 60], "tag": "named-port http:80" },
+    { "id": "template", "type": "cloud", "label": "Instance template", "sublabel": "global, e2-medium", "pos": [1020, 100], "size": [150, 60] },
+    { "id": "startup", "type": "backend", "label": "startup-script.sh", "sublabel": "apache2 + hostname", "pos": [1240, 100], "size": [130, 60] },
+    { "id": "fwhc", "type": "security", "label": "fw-allow-health-check", "sublabel": "tcp:80 desde 130.211/35.191", "pos": [1010, 400], "size": [170, 60] },
+
+    { "id": "nlb", "type": "cloud", "label": "Network LB", "sublabel": "www-rule + www-pool", "pos": [230, 400], "size": [130, 60] },
+    { "id": "vms", "type": "backend", "label": "web1..web3", "sublabel": "VMs sueltas, e2-small", "pos": [430, 400], "size": [130, 60] },
+    { "id": "fwwww", "type": "security", "label": "www-firewall-network-lb", "sublabel": "tcp:80 desde 0.0.0.0/0", "pos": [680, 400], "size": [170, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Google Cloud: PROJECT_ID / REGION / ZONE (env.sh)", "wraps": ["ip", "fwd", "proxy", "urlmap", "backend", "hc", "mig", "template", "startup", "fwhc", "nlb", "vms", "fwwww"] }
+  ],
+  "connections": [
+    { "id": "users-fwd", "from": "users", "to": "fwd", "label": "HTTP", "variant": "emphasis", "fromSide": "right", "toSide": "left" },
+    { "id": "ip-fwd", "from": "ip", "to": "fwd", "label": "usa", "fromSide": "bottom", "toSide": "top" },
+    { "id": "fwd-proxy", "from": "fwd", "to": "proxy" },
+    { "id": "proxy-urlmap", "from": "proxy", "to": "urlmap" },
+    { "id": "urlmap-backend", "from": "urlmap", "to": "backend" },
+    { "id": "backend-mig", "from": "backend", "to": "mig", "label": "backend" },
+    { "id": "hc-backend", "from": "hc", "to": "backend", "label": "sondea", "fromSide": "bottom", "toSide": "top" },
+    { "id": "template-mig", "from": "template", "to": "mig", "label": "crea VMs", "fromSide": "bottom", "toSide": "top" },
+    { "id": "startup-template", "from": "startup", "to": "template", "label": "metadata", "fromSide": "left", "toSide": "right" },
+    { "id": "fwhc-mig", "from": "fwhc", "to": "mig", "label": "tag allow-health-check", "variant": "security", "fromSide": "top", "toSide": "bottom" },
+
+    { "id": "users-nlb", "from": "users", "to": "nlb", "label": "HTTP", "variant": "emphasis", "fromSide": "right", "toSide": "left" },
+    { "id": "nlb-vms", "from": "nlb", "to": "vms" },
+    { "id": "fwwww-vms", "from": "fwwww", "to": "vms", "label": "tag network-lb-tag", "variant": "security" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "HTTP LB clasico (create-lb.sh)", "items": ["IP, health check, backend service, URL map, proxy y forwarding rule", "Template global + MIG de 3 VMs lb-backend-group-xxxx", "Named port http:80 igual al port-name del backend"] },
+    { "dot": "cyan", "title": "Network LB (create-network-lb.sh)", "items": ["IP network-lb-ip-1, basic-check, www-pool, www-rule", "VMs web1..3 con tag network-lb-tag", "Firewall www-firewall-network-lb"] },
+    { "dot": "amber", "title": "Como correrlo", "items": ["Exportar PROJECT_ID y ZONE (REGION se deriva)", "bash run-all.sh y luego bash verify.sh", "Sin probar contra GCP: solo bash -n"] }
+  ]
+}
