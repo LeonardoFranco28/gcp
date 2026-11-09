@@ -12,6 +12,6 @@ for i in 1 2 3; do
     --image-family=debian-12 \
     --image-project=debian-cloud \
     --tags=network-lb-tag \
-    --metadata-from-file=startup-script="$f"
+    --metadata-from-file=startup-script="$f" || { rm -f "$f"; exit 1; }
   rm -f "$f"
 done

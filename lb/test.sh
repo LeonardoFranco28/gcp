@@ -26,4 +26,4 @@ for i in 1
 9
 10
 11
-12; do curl -s http://34.120.89.11\; done | sort | uniq -c
+12; do curl -s http://34.8.190.180\; done | sort | uniq -c

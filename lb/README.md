@@ -6,7 +6,7 @@ network load balancer and a classic global HTTP load balancer.
 ## Settings
 
 `env.sh` resolves `PROJECT_ID`, `ZONE` and `REGION` in this order: flag, env
-var, `gcloud config`, then the lab default (`us-east4-c`; `REGION` is derived
+var, saved `.lab-env`, `gcloud config`, then the lab default (`us-east4-c`; `REGION` is derived
 from `ZONE`). `PROJECT_ID` has no default.
 
 ```bash
@@ -15,6 +15,13 @@ bash run-all.sh --project <lab project> --zone us-east4-c --region us-east4
 export PROJECT_ID=<lab project> ZONE=us-east4-c REGION=us-east4
 bash run-all.sh
 ```
+
+A `--zone`/`--region` flag is saved in `lb/.lab-env` (gitignored), so later runs
+(`cleanup.sh`, `verify.sh`) reuse it. Delete that file to forget it.
+
+The resolved values are also written to `gcloud config` (`project`, `compute/region`,
+`compute/zone`), so manual `gcloud` commands use them too. This changes the global
+gcloud config: fine in a lab account, think twice on a personal one.
 
 Every script accepts the same flags (`--zone=x` form too). A `--zone` without
 `--region` derives the region from the zone.
